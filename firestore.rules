@@ -1,36 +1,58 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    
     // Helper function to check if user is signed in
     function isSignedIn() {
       return request.auth != null;
     }
-
+    function isOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId;
+    }
+    
     // Users collection: Users can read/write their own data
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && request.auth.uid == userId;
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
     }
-
-    // Videos collection: Everyone can read. 
-    // Ideally, only admins should write. For now, allowing all signed-in users 
-    // but the UI restricts it. Warning: Secure this for production!
+    
+    // Videos collection - PER-USER ISOLATION
+    // Each user can ONLY see their own videos
     match /videos/{videoId} {
-      allow read: if true;
-      // Allow create only if signed in (AdminDashboard uses signed in user)
-      allow create: if isSignedIn(); 
-      // Allow update mostly for like counts (this is open, but simpler for now)
-      allow update: if isSignedIn();
+      // Users can only read their own videos
+      allow read: if isSignedIn() && 
+                     resource.data.ownerId == request.auth.uid;
+      
+      // Users can only create videos with their own UID as owner
+      allow create: if isSignedIn() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      
+      // Users can only update their own videos (for like counts, etc)
+      allow update: if isSignedIn() && 
+                       resource.data.ownerId == request.auth.uid;
+      
+      // Users can only delete their own videos
+      allow delete: if isSignedIn() && 
+                       resource.data.ownerId == request.auth.uid;
       
       // Comments subcollection
       match /comments/{commentId} {
-        allow read: if true;
-        allow create: if isSignedIn();
+        // Anyone can read comments (but only if they can access the parent video)
+        allow read: if isSignedIn();
+        
+        // Users can create comments with their own userId
+        allow create: if isSignedIn() && 
+                         request.resource.data.userId == request.auth.uid;
+        
+        // Users can update/delete only their own comments
+        allow update, delete: if isSignedIn() && 
+                                 resource.data.userId == request.auth.uid;
       }
     }
-
-    // User Likes
+    
+    // User Likes - Per user
     match /user_likes/{likeId} {
+      // Users can read/write only their own likes
       allow read, write: if isSignedIn();
     }
   }

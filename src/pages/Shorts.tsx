@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, where, getDocs } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { useAuth } from "../hooks/useAuth";
 import VideoItem from "../components/VideoItem";
 import CommentDrawer from "../components/CommentDrawer";
 import LoadingScreen from "../components/LoadingScreen";
@@ -13,6 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const Shorts = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
@@ -23,8 +25,17 @@ const Shorts = () => {
   // Fetch videos
   useEffect(() => {
     const fetchVideos = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+        const q = query(
+          collection(db, "videos"),
+          where("ownerId", "==", user.uid),
+          orderBy("createdAt", "desc"),
+        );
         const querySnapshot = await getDocs(q);
         const fetchedVideos = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -56,7 +67,46 @@ const Shorts = () => {
     };
 
     fetchVideos();
-  }, [location.state]);
+  }, [location.state, user]);
+
+  // DEBUG: Log videos state
+  console.log("🎬 Shorts Debug:", {
+    loading,
+    videosCount: videos.length,
+    hasUser: !!user,
+    videos: videos.map((v) => ({
+      id: v.id,
+      title: v.title,
+      youtubeId: v.youtubeId,
+    })),
+  });
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  // Show message if no videos
+  if (videos.length === 0) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
+          bgcolor: "#000",
+          color: "white",
+        }}
+      >
+        <Typography variant="h6">Belum Ada Video</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Tambahkan video melalui Admin Dashboard
+        </Typography>
+      </Box>
+    );
+  }
 
   const handleScroll = () => {
     if (containerRef.current) {

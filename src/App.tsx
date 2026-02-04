@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Shorts from "./pages/Shorts";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
 import Settings from "./pages/Settings";
+import Landing from "./pages/Landing";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoadingScreen from "./components/LoadingScreen";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { getTheme } from "./lib/theme";
 import { useAppStore } from "./store/useAppStore";
@@ -16,7 +19,7 @@ function App() {
   const theme = getTheme(isDarkMode ? "dark" : "light");
 
   // Sync Auth with Store
-  const { userData } = useAuth();
+  const { user, userData, loading } = useAuth();
   const setCurrentUser = useAppStore((state) => state.setCurrentUser);
 
   useEffect(() => {
@@ -27,17 +30,84 @@ function App() {
     }
   }, [userData, setCurrentUser]);
 
+  if (loading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <LoadingScreen />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shorts" element={<Shorts />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/settings" element={<Settings />} />
+          {/* Root - redirect based on auth */}
+          <Route
+            path="/"
+            element={
+              user ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="/landing" replace />
+              )
+            }
+          />
+
+          {/* Public route */}
+          <Route path="/landing" element={<Landing />} />
+
+          {/* Protected routes */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shorts"
+            element={
+              <ProtectedRoute>
+                <Shorts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

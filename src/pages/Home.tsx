@@ -9,9 +9,11 @@ import {
   AppBar,
   Toolbar,
   Avatar,
+  Button,
 } from "@mui/material";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, where, getDocs } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import { useAuth } from "../hooks/useAuth";
 import LoadingScreen from "../components/LoadingScreen";
 import OnboardingModal from "../components/OnboardingModal";
 import BottomNav from "../components/BottomNav";
@@ -20,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -35,8 +38,17 @@ const Home = () => {
 
   useEffect(() => {
     const fetchVideos = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+        const q = query(
+          collection(db, "videos"),
+          where("ownerId", "==", user.uid),
+          orderBy("createdAt", "desc"),
+        );
         const querySnapshot = await getDocs(q);
         const fetchedVideos = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -51,7 +63,7 @@ const Home = () => {
     };
 
     fetchVideos();
-  }, []);
+  }, [user]);
 
   const openVideo = (video: Video) => {
     navigate("/shorts", { state: { videoId: video.id } });
@@ -87,167 +99,194 @@ const Home = () => {
         </Toolbar>
       </AppBar>
 
-      {/* SHORTS SECTION */}
-      <Box sx={{ py: 2 }}>
-        <Typography variant="h6" fontWeight="bold" sx={{ px: 2, mb: 1.5 }}>
-          Shorts
-        </Typography>
-
-        {/* Horizontal Scrollable Shorts */}
+      {/* Empty State or Content */}
+      {videos.length === 0 ? (
         <Box
           sx={{
             display: "flex",
-            overflowX: "auto",
-            gap: 2,
-            px: 2,
-            pb: 2,
-            "&::-webkit-scrollbar": {
-              height: 8,
-            },
-            "&::-webkit-scrollbar-thumb": {
-              bgcolor: "divider",
-              borderRadius: 4,
-            },
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "70vh",
+            px: 3,
+            textAlign: "center",
           }}
         >
-          {shortsVideos.map((video) => (
-            <Card
-              key={video.id}
-              sx={{
-                minWidth: 160,
-                maxWidth: 160,
-                borderRadius: 2,
-                cursor: "pointer",
-                transition: "transform 0.2s",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
-              }}
-            >
-              <CardActionArea onClick={() => openVideo(video)}>
-                <CardMedia
-                  component="img"
-                  image={video.thumbnail}
-                  alt={video.title}
-                  sx={{
-                    height: 280,
-                    objectFit: "cover",
-                  }}
-                />
-                <CardContent sx={{ p: 1.5 }}>
-                  <Typography
-                    variant="body2"
-                    fontWeight="medium"
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                    }}
-                  >
-                    {video.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {video.likeCount || 0} suka
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))}
+          <Box sx={{ mb: 3 }}>
+            <img
+              src="/miawtube.svg"
+              alt="No videos"
+              style={{ width: 100, height: 100, opacity: 0.5 }}
+            />
+          </Box>
+          <Typography variant="h6" gutterBottom>
+            Belum Ada Video
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Mulai tambahkan video untuk koleksi Anda
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/admin")}
+            sx={{ textTransform: "none" }}
+          >
+            Buka Admin Dashboard
+          </Button>
         </Box>
-      </Box>
+      ) : (
+        <>
+          {/* SHORTS SECTION */}
+          <Box sx={{ py: 2 }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ px: 2, mb: 1.5 }}>
+              Shorts
+            </Typography>
 
-      {/* REGULAR VIDEOS SECTION */}
-      <Box sx={{ py: 2 }}>
-        <Typography variant="h6" fontWeight="bold" sx={{ px: 2, mb: 1.5 }}>
-          Video
-        </Typography>
-
-        {/* Vertical List of Regular Videos */}
-        <Box sx={{ px: 2 }}>
-          {regularVideos.map((video) => (
-            <Card
-              key={video.id}
+            {/* Horizontal Scrollable Shorts */}
+            <Box
               sx={{
                 display: "flex",
-                mb: 2,
-                borderRadius: 2,
-                cursor: "pointer",
-                transition: "transform 0.2s",
-                "&:hover": {
-                  transform: "scale(1.02)",
+                overflowX: "auto",
+                gap: 2,
+                px: 2,
+                pb: 2,
+                "&::-webkit-scrollbar": {
+                  height: 8,
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  bgcolor: "divider",
+                  borderRadius: 4,
                 },
               }}
             >
-              <CardActionArea
-                onClick={() => openVideo(video)}
-                sx={{ display: "flex", alignItems: "flex-start", p: 0 }}
-              >
-                {/* Thumbnail - Landscape 16:9 */}
-                <CardMedia
-                  component="img"
-                  image={video.thumbnail}
-                  alt={video.title}
+              {shortsVideos.map((video) => (
+                <Card
+                  key={video.id}
                   sx={{
-                    width: 168,
-                    height: 94,
-                    objectFit: "cover",
-                    borderRadius: "8px 0 0 8px",
+                    minWidth: 160,
+                    maxWidth: 160,
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    transition: "transform 0.2s",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                    },
                   }}
-                />
-
-                {/* Video Info */}
-                <Box sx={{ flex: 1, p: 1.5 }}>
-                  <Typography
-                    variant="body2"
-                    fontWeight="medium"
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      mb: 0.5,
-                    }}
-                  >
-                    {video.title}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    <Avatar
-                      sx={{ width: 24, height: 24 }}
-                      src="/miawtube.svg"
+                >
+                  <CardActionArea onClick={() => openVideo(video)}>
+                    <CardMedia
+                      component="img"
+                      image={video.thumbnail}
+                      alt={video.title}
+                      sx={{
+                        height: 280,
+                        objectFit: "cover",
+                      }}
                     />
-                    <Typography variant="caption" color="text.secondary">
-                      MiawTube
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {video.likeCount || 0} suka · {video.views || 0} views
-                  </Typography>
-                </Box>
-              </CardActionArea>
-            </Card>
-          ))}
-        </Box>
-      </Box>
+                    <CardContent sx={{ p: 1.5 }}>
+                      <Typography
+                        variant="body2"
+                        fontWeight="medium"
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {video.title}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {video.likeCount || 0} suka
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              ))}
+            </Box>
+          </Box>
 
-      {videos.length === 0 && (
-        <Box sx={{ textAlign: "center", mt: 8, px: 2 }}>
-          <Typography variant="h6" color="text.secondary">
-            Belum ada video
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Admin dapat menambahkan video melalui Panel Admin
-          </Typography>
-        </Box>
+          {/* REGULAR VIDEOS SECTION */}
+          <Box sx={{ py: 2 }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ px: 2, mb: 1.5 }}>
+              Video
+            </Typography>
+
+            {/* Vertical List of Regular Videos */}
+            <Box sx={{ px: 2 }}>
+              {regularVideos.map((video) => (
+                <Card
+                  key={video.id}
+                  sx={{
+                    display: "flex",
+                    mb: 2,
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    transition: "transform 0.2s",
+                    "&:hover": {
+                      transform: "scale(1.02)",
+                    },
+                  }}
+                >
+                  <CardActionArea
+                    onClick={() => openVideo(video)}
+                    sx={{ display: "flex", alignItems: "flex-start", p: 0 }}
+                  >
+                    {/* Thumbnail - Landscape 16:9 */}
+                    <CardMedia
+                      component="img"
+                      image={video.thumbnail}
+                      alt={video.title}
+                      sx={{
+                        width: 168,
+                        height: 94,
+                        objectFit: "cover",
+                        borderRadius: "8px 0 0 8px",
+                      }}
+                    />
+
+                    {/* Video Info */}
+                    <Box sx={{ flex: 1, p: 1.5 }}>
+                      <Typography
+                        variant="body2"
+                        fontWeight="medium"
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          mb: 0.5,
+                        }}
+                      >
+                        {video.title}
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          mt: 0.5,
+                        }}
+                      >
+                        <Avatar
+                          sx={{ width: 24, height: 24 }}
+                          src="/miawtube.svg"
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          MiawTube
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {video.likeCount || 0} suka · {video.views || 0} views
+                      </Typography>
+                    </Box>
+                  </CardActionArea>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        </>
       )}
 
       <BottomNav />

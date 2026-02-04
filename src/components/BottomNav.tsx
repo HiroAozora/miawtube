@@ -10,7 +10,7 @@ const BottomNav = () => {
   const location = useLocation();
 
   const getActiveTab = () => {
-    if (location.pathname === "/") return 0;
+    if (location.pathname === "/" || location.pathname === "/home") return 0;
     if (location.pathname === "/shorts") return 1;
     if (location.pathname === "/about") return 2;
     if (location.pathname === "/profile") return 3;
@@ -25,7 +25,7 @@ const BottomNav = () => {
       <BottomNavigation
         value={getActiveTab()}
         onChange={(_event, newValue) => {
-          if (newValue === 0) navigate("/");
+          if (newValue === 0) navigate("/home");
           if (newValue === 1) navigate("/shorts");
           if (newValue === 2) navigate("/about");
           if (newValue === 3) navigate("/profile");

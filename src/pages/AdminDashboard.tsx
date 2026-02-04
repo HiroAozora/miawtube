@@ -41,6 +41,7 @@ import {
   doc,
   query,
   orderBy,
+  where,
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
@@ -127,8 +128,14 @@ const AdminDashboard = () => {
   }, [isPinVerified]);
 
   const fetchExistingVideos = async () => {
+    if (!user) return;
+
     try {
-      const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+      const q = query(
+        collection(db, "videos"),
+        where("ownerId", "==", user.uid),
+        orderBy("createdAt", "desc"),
+      );
       const querySnapshot = await getDocs(q);
       const videos = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -139,7 +146,6 @@ const AdminDashboard = () => {
       console.error("Error fetching videos:", error);
     }
   };
-
   const handlePinSubmit = async () => {
     if (isSettingNewPin) {
       if (inputPin.length < 4) return;
@@ -242,11 +248,13 @@ const AdminDashboard = () => {
 
       const videoData = response.data.items[0];
       await addDoc(collection(db, "videos"), {
+        youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`,
         youtubeId: videoId,
         title: videoData.snippet.title,
         thumbnail:
           videoData.snippet.thumbnails.high?.url ||
           videoData.snippet.thumbnails.default.url,
+        ownerId: user?.uid || "",
         addedBy: user?.displayName || "Admin",
         likeCount: 0,
         createdAt: serverTimestamp(),
@@ -272,9 +280,11 @@ const AdminDashboard = () => {
 
     try {
       await addDoc(collection(db, "videos"), {
+        youtubeUrl: `https://www.youtube.com/watch?v=${videoItem.id.videoId}`,
         youtubeId: videoItem.id.videoId,
         title: videoItem.snippet.title,
         thumbnail: videoItem.snippet.thumbnails.high.url,
+        ownerId: user?.uid || "",
         addedBy: user?.displayName || "Admin",
         likeCount: 0,
         createdAt: serverTimestamp(),

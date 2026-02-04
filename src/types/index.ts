@@ -14,11 +14,12 @@ export interface Video {
   title: string;
   thumbnail: string;
   createdAt: any;
+  ownerId: string; // User ID who owns this video
+  addedBy?: string; // Admin who added the video
   likeCount?: number;
   commentCount?: number;
   shareCount?: number;
   views?: number;
-  addedBy?: string; // Admin who added the video
 }
 
 export interface Comment {

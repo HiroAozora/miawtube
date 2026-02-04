@@ -27,6 +27,7 @@ import {
   query,
   getDocs,
   orderBy,
+  where,
   updateDoc,
   doc,
 } from "firebase/firestore";
@@ -47,13 +48,12 @@ const Profile = () => {
     const fetchMyVideos = async () => {
       if (!user) return;
       try {
-        // Fetch videos added by this user (or all if admin checks, but let's stick to 'addedBy')
-        // Note: Currently 'addedBy' checks display name, which is fragile.
-        // Ideally we should store userId in video doc. For now, we list all or filter client side if needed.
-        // Let's fetch all for demo purpose of "My List" or "History" roughly
-
-        // Simpler: Just fetch all videos to show "Library"
-        const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+        // Fetch videos owned by this user
+        const q = query(
+          collection(db, "videos"),
+          where("ownerId", "==", user.uid),
+          orderBy("createdAt", "desc"),
+        );
         const querySnapshot = await getDocs(q);
         const videos = querySnapshot.docs.map((doc) => ({
           id: doc.id,

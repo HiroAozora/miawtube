@@ -15,7 +15,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../hooks/useAuth";
-import { useAppStore } from "../store/useAppStore";
 import type { Video } from "../types";
 
 interface VideoItemProps {
@@ -30,11 +29,42 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
   const [playing, setPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  // Use global mute state so unmute persists across videos
-  const muted = useAppStore((state) => state.isVideoMuted);
-  const setMuted = useAppStore((state) => state.setVideoMuted);
-
   const [likesCount, setLikesCount] = useState(video.likeCount || 0);
+
+  // Extract youtubeId if missing (fallback from youtubeUrl)
+  const getYoutubeId = () => {
+    if (video.youtubeId) return video.youtubeId;
+
+    // Try to extract from youtubeUrl if available
+    if (video.youtubeUrl) {
+      const match = video.youtubeUrl.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/,
+      );
+      return match ? match[1] : null;
+    }
+
+    return null;
+  };
+
+  const youtubeId = getYoutubeId();
+
+  // Don't render if no valid youtubeId
+  if (!youtubeId) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#000",
+        }}
+      >
+        <Typography color="white">Video ID tidak valid</Typography>
+      </Box>
+    );
+  }
 
   useEffect(() => {
     // Add delay to prevent play/pause race condition
@@ -43,7 +73,7 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
     if (isActive && isReady) {
       // Delay play slightly to ensure player is fully ready
       playTimer = setTimeout(() => {
-        console.log("🎬 Attempting to play:", video.youtubeId);
+        console.log("🎬 Attempting to play:", youtubeId);
         setPlaying(true);
       }, 100);
     } else {
@@ -62,7 +92,7 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
       clearTimeout(playTimer);
       clearTimeout(readyTimer);
     };
-  }, [isActive, isReady, video.youtubeId]);
+  }, [isActive, isReady, youtubeId]);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -133,16 +163,7 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
       }}
     >
       {/* Video Player */}
-      <Box
-        sx={{ width: "100%", height: "100%", position: "relative" }}
-        onClick={() => {
-          console.log("🖱️ Video clicked");
-          if (muted) {
-            console.log("Unmuting video");
-            setMuted(false); // This will trigger iframe reload with mute=0
-          }
-        }}
-      >
+      <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
         {!isReady && (
           <Box
             sx={{
@@ -197,12 +218,12 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
             </Box>
           </Box>
         )}
-        {/* YouTube iframe - Direct embed with hidden controls for clean UI */}
+        {/* YouTube iframe - Hidden controls for clean UI */}
         <iframe
-          key={video.youtubeId}
+          key={youtubeId}
           width="100%"
           height="100%"
-          src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=${isActive && isReady ? 1 : 0}&mute=${muted ? 1 : 0}&loop=1&playlist=${video.youtubeId}&controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&fs=0&disablekb=1&playsinline=1&origin=${window.location.origin}`}
+          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${isActive ? 1 : 0}&mute=0&loop=1&playlist=${youtubeId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&disablekb=1`}
           title={video.title}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -214,45 +235,14 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
             left: 0,
             width: "100%",
             height: "100%",
-            pointerEvents: "none", // Prevent YouTube UI from being clickable
+            pointerEvents: "none", // Prevent YouTube UI interaction
           }}
           onLoad={() => {
-            console.log("✅ Iframe Loaded:", video.youtubeId);
+            console.log("✅ Iframe Loaded:", youtubeId);
             setIsReady(true);
           }}
         />
       </Box>
-
-      {/* Mute Indicator */}
-      {muted && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 10,
-            pointerEvents: "none",
-            bgcolor: "rgba(0,0,0,0.7)",
-            px: 3,
-            py: 2,
-            borderRadius: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-            }}
-          >
-            🔇 Tap to unmute
-          </Typography>
-        </Box>
-      )}
 
       {/* Side Actions */}
       <Box
