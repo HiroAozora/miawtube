@@ -10,6 +10,7 @@ export interface UserData {
 export interface Video {
   id?: string;
   youtubeUrl: string;
+  youtubeId?: string; // For backwards compatibility
   title: string;
   thumbnail: string;
   createdAt: any;
@@ -17,6 +18,7 @@ export interface Video {
   commentCount?: number;
   shareCount?: number;
   views?: number;
+  addedBy?: string; // Admin who added the video
 }
 
 export interface Comment {
