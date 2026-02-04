@@ -51,7 +51,7 @@ const About = () => {
     {
       question: "Bisakah saya menginstal ini sebagai aplikasi?",
       answer:
-        "Ya! Miawtube adalah PWA (Progressive Web App). Di browser seluler, ketuk menu browser dan pilih 'Tambahkan ke Layar Utama' atau 'Instal Aplikasi'.",
+        "Ya! MiawTube adalah PWA (Progressive Web App). Di browser seluler, ketuk menu browser dan pilih 'Tambahkan ke Layar Utama' atau 'Instal Aplikasi'.",
     },
   ];
 
@@ -73,12 +73,12 @@ const About = () => {
             <ArrowBackIcon />
           </IconButton>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: 1 }}>
-            <img src="/miawtube.svg" alt="Miawtube" style={{ height: 28 }} />
+            <img src="/miawtube.svg" alt="MiawTube" style={{ height: 28 }} />
             <Typography
               variant="h6"
               sx={{ fontWeight: "bold", fontFamily: "Oswald" }}
             >
-              Tentang Miawtube
+              Tentang MiawTube
             </Typography>
           </Box>
         </Toolbar>
@@ -90,7 +90,7 @@ const About = () => {
           <Box sx={{ mb: 3 }}>
             <img
               src="/miawtube.svg"
-              alt="Miawtube"
+              alt="MiawTube"
               style={{ width: 100, height: 100 }}
             />
           </Box>
@@ -100,16 +100,16 @@ const About = () => {
             gutterBottom
             sx={{ fontFamily: "Oswald" }}
           >
-            Selamat Datang di Miawtube
+            Selamat Datang di MiawTube
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             sx={{ maxWidth: 600, mx: "auto" }}
           >
-            Platform video bergaya TikTok yang dirancang untuk konten aman dan
-            ter-kurasi. Jelajahi, suka, komentar, dan bagikan video dalam format
-            video pendek yang familiar.
+            Platform video bergaya YouTube Shorts yang dirancang untuk konten
+            aman dan ter-kurasi. Jelajahi grid video, klik untuk menonton
+            fullscreen, suka, komentar, dan bagikan!
           </Typography>
         </Box>
 
@@ -126,9 +126,9 @@ const About = () => {
                   sx={{ fontSize: 40, color: "primary.main" }}
                 />
               ),
-              title: "Feed Bergaya TikTok",
+              title: "Grid Bergaya YouTube Shorts",
               description:
-                "Geser atas/bawah untuk menjelajahi video dengan scroll halus dan autoplay",
+                "Jelajahi banyak video dalam tampilan grid. Tap thumbnail untuk menonton fullscreen",
             },
             {
               icon: (
@@ -223,7 +223,7 @@ const About = () => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Miawtube © {new Date().getFullYear()}
+            MiawTube © {new Date().getFullYear()}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             Dibuat dengan ❤️ untuk tontonan video yang aman dan ter-kurasi

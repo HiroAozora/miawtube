@@ -9,11 +9,14 @@ export interface UserData {
 
 export interface Video {
   id?: string;
-  youtubeId: string;
+  youtubeUrl: string;
   title: string;
-  thumbnail?: string;
-  addedBy: string;
-  likeCount: number;
+  thumbnail: string;
+  createdAt: any;
+  likeCount?: number;
+  commentCount?: number;
+  shareCount?: number;
+  views?: number;
 }
 
 export interface Comment {

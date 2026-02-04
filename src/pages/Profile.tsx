@@ -18,6 +18,7 @@ import {
   Container,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SettingsIcon from "@mui/icons-material/Settings";
 import LockIcon from "@mui/icons-material/LockOutlined";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -160,6 +161,26 @@ const Profile = () => {
           <Typography variant="body2" color="text.secondary">
             {user.email}
           </Typography>
+
+          <Button
+            variant="outlined"
+            fullWidth
+            sx={{ mt: 2, borderRadius: 20 }}
+            onClick={logout}
+          >
+            Keluar
+          </Button>
+
+          {/* Settings Button */}
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<SettingsIcon />}
+            sx={{ mt: 2, borderRadius: 20 }}
+            onClick={() => navigate("/settings")}
+          >
+            Pengaturan
+          </Button>
 
           <Button
             variant="outlined"

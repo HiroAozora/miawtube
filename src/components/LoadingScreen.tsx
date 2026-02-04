@@ -47,7 +47,7 @@ const LoadingScreen = () => {
       >
         <img
           src="/miawtube.svg"
-          alt="Miawtube"
+          alt="MiawTube"
           style={{
             width: 100,
             height: 100,
@@ -66,7 +66,7 @@ const LoadingScreen = () => {
           animation: `${fadeIn} 0.8s ease-out`,
         }}
       >
-        MIAWTUBE
+        MiawTube
       </Typography>
 
       {/* Loading Dots */}

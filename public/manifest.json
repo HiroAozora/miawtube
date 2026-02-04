@@ -1,18 +1,16 @@
 {
-  "name": "Miawtube",
-  "short_name": "Miawtube",
-  "description": "TikTok-style video sharing platform",
+  "name": "MiawTube",
+  "short_name": "MiawTube",
+  "description": "Platform video bergaya YouTube Shorts untuk konten aman dan ter-kurasi",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "/miawtube.svg",
+      "src": "/miawtubePWA.svg",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     }
   ]
 }

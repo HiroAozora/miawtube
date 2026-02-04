@@ -30,15 +30,15 @@ const OnboardingModal = ({ open, onClose }: OnboardingModalProps) => {
       icon: (
         <PlayCircleOutlineIcon sx={{ fontSize: 80, color: "primary.main" }} />
       ),
-      title: "Selamat Datang di Miawtube!",
+      title: "Selamat Datang di MiawTube!",
       description:
-        "Temukan dan nikmati video pendek dengan gaya TikTok. Geser atas/bawah untuk menjelajahi konten tanpa batas.",
+        "Jelajahi dan nikmati video pendek bergaya YouTube Shorts. Tap thumbnail untuk menonton, geser untuk menjelajah!",
     },
     {
       icon: <img src="/miawtube.svg" alt="Fitur" style={{ width: 80 }} />,
       title: "Berinteraksi dengan Video",
       description:
-        "Suka, komentar, dan bagikan video favoritmu. Ketuk video untuk menyalakan suara!",
+        "Suka, komentar, dan bagikan video favoritmu. Tap video untuk membuka fullscreen dengan kontrol penuh!",
       features: [
         {
           icon: <FavoriteBorderIcon sx={{ fontSize: 40 }} />,

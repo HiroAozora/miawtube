@@ -351,7 +351,7 @@ const AdminDashboard = () => {
           color="text.secondary"
           sx={{ mb: 4, textAlign: "center", maxWidth: 300 }}
         >
-          To manage Miawtube videos and settings, please verify your identity.
+          To manage MiawTube videos and settings, please verify your identity.
         </Typography>
         <Button
           variant="contained"

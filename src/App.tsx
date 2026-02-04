@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Shorts from "./pages/Shorts";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import About from "./pages/About";
+import Settings from "./pages/Settings";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { getTheme } from "./lib/theme";
 import { useAppStore } from "./store/useAppStore";
@@ -31,9 +33,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/shorts" element={<Shorts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/about" element={<About />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -105,7 +105,7 @@ const VideoItem = ({ video, isActive, onCommentClick }: VideoItemProps) => {
       try {
         await navigator.share({
           title: video.title,
-          text: `Check out this video on Miawtube!`,
+          text: `Check out this video on MiawTube!`,
           url: window.location.href,
         });
       } catch (err) {
