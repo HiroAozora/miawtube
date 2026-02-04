@@ -22,8 +22,8 @@ import LoadingScreen from "../components/LoadingScreen";
 import OnboardingModal from "../components/OnboardingModal";
 import type { Video } from "../types";
 import { useNavigate, useLocation } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useAppStore } from "../store/useAppStore";
 import { useAuth } from "../hooks/useAuth";
 
@@ -122,9 +122,6 @@ const Home = () => {
   };
 
   // Menu Handlers
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -353,7 +350,6 @@ const Home = () => {
               key={video.id}
               video={video}
               isActive={index === activeVideoIndex}
-              shouldLoad={Math.abs(index - activeVideoIndex) <= 1}
               onCommentClick={() => openComments(video.id)}
             />
           ))

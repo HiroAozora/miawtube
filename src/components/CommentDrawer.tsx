@@ -23,7 +23,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../hooks/useAuth";
-import { Comment } from "../types";
+import type { Comment } from "../types";
 
 interface CommentDrawerProps {
   open: boolean;

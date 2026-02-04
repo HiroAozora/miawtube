@@ -18,14 +18,12 @@ import {
   Container,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LockIcon from "@mui/icons-material/LockOutlined";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import {
   collection,
   query,
-  where,
   getDocs,
   orderBy,
   updateDoc,
@@ -38,7 +36,6 @@ const Profile = () => {
   const { user, userData, logout } = useAuth();
   const navigate = useNavigate();
   const [myVideos, setMyVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // PIN States
   const [showPinDialog, setShowPinDialog] = useState(false);
@@ -65,8 +62,6 @@ const Profile = () => {
         setMyVideos(videos);
       } catch (error) {
         console.error("Error fetching profile videos:", error);
-      } finally {
-        setLoading(false);
       }
     };
 

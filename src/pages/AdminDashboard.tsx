@@ -30,7 +30,6 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LockIcon from "@mui/icons-material/LockOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from "@mui/icons-material/Link";
 import YoutubeSearchedForIcon from "@mui/icons-material/YoutubeSearchedFor";
@@ -44,7 +43,6 @@ import {
   orderBy,
   getDocs,
   deleteDoc,
-  where,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../hooks/useAuth";
@@ -469,7 +467,7 @@ const AdminDashboard = () => {
         </Toolbar>
         <Tabs
           value={tabValue}
-          onChange={(e, val) => setTabValue(val)}
+          onChange={(_e, val) => setTabValue(val)}
           variant="fullWidth"
           indicatorColor="primary"
           textColor="primary"
@@ -555,7 +553,10 @@ const AdminDashboard = () => {
 
           <Grid container spacing={2}>
             {searchResults.map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id.videoId}>
+              <Box
+                key={item.id.videoId}
+                sx={{ width: { xs: "100%", sm: "50%", md: "33.333%" }, p: 1 }}
+              >
                 <Card
                   sx={{
                     height: "100%",
@@ -592,7 +593,7 @@ const AdminDashboard = () => {
                     </Button>
                   </CardActions>
                 </Card>
-              </Grid>
+              </Box>
             ))}
           </Grid>
         </CustomTabPanel>
