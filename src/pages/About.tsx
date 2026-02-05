@@ -26,12 +26,7 @@ const About = () => {
     {
       question: "Bagaimana cara menonton video?",
       answer:
-        "Cukup geser ke atas atau bawah untuk menjelajahi video, seperti TikTok! Video akan otomatis diputar saat muncul di layar.",
-    },
-    {
-      question: "Bagaimana cara menyalakan suara video?",
-      answer:
-        "Ketuk di mana saja pada video saat melihat pesan '🔇 Ketuk untuk menyalakan suara'. Setelah suara dinyalakan, semua video berikutnya akan otomatis terdengar!",
+        "Cukup geser ke atas atau bawah untuk menjelajahi video, seperti YouTube Shorts Video akan otomatis diputar saat muncul di layar.",
     },
     {
       question: "Bisakah saya menyukai dan berkomentar di video?",
